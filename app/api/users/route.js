@@ -21,11 +21,4 @@ export async function POST(request) {
     } else {
         return NextResponse.json({ message: 'Invalid email or password' }, { status: 401 });
     }
-
-
-    // if (user) {
-    //     return NextResponse.json(user);
-    // } else {
-    //     return NextResponse.json({ message: 'Invalid email or password' }, { status: 401 });
-    // }
 }

@@ -3,12 +3,13 @@
 import { ChangeEvent, FormEvent, useState, FocusEvent } from "react";
 import classes from "./page.module.css";
 import Link from "next/link";
+import WellcomePage from "./wellcome/page";
 
 export default function Home() {
 
   const [user, setUser] = useState(null)
 
-  const [token, setToken] = useState('')
+  const [token, setToken] = useState(localStorage.getItem('token') || '')
 
   const [credentials, setCredentials] = useState({
     email: '',
@@ -54,48 +55,53 @@ export default function Home() {
     });
     const data = await res.json();
 
-    console.log('TOKEN: ',data)
-
     if(res.ok) {
-      setUser(data)
+      setToken(data.token);
+      localStorage.setItem('token', data.token)
+      console.log('Localstorage: ', localStorage.getItem('token'))
     } else {
       console.error('login Error: ', data.message)
     }
   }
 
   return (
+    <>
+    { !token &&
     <main className={classes.main}>
-      <div className={classes.login_animation_container}>
-        <div className="backgroud-animation">
-          <p>Animation</p>
-        </div>
+    <div className={classes.login_animation_container}>
+      <div className="backgroud-animation">
+        <p>Animation</p>
       </div>
+    </div>
 
-      <div className={classes.login_form_container}>
-        <div className="login-form">
-          <h1>Login</h1>
-          <form onSubmit={handleSubmit}>
-            <div className="form-group">
-                <label htmlFor="email">User:</label>
-                <input type="email" id="email" name="email" required
-                onChange={handleChange}
-                onBlur={handleBlur}/>
-                {errors.email && <p className="error">{errors.email}</p>}
-            </div>
-            <div className="form-group">
-                <label htmlFor="password">Password:</label>
-                <input type="password" id="password" name="password" required
-                onChange={handleChange}
-                onBlur={handleBlur}/>
-                {errors.password && <p className="error">{errors.password}</p>}
-            </div>
-            <div className="form-group">
-                <button type="submit">ENTRAR</button>
-            </div>
-            <Link href='/wellcome'>Wellcome</Link>
-          </form>
-        </div>
+    <div className={classes.login_form_container}>
+      <div className="login-form">
+        <h1>Login</h1>
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+              <label htmlFor="email">User:</label>
+              <input type="email" id="email" name="email" required
+              onChange={handleChange}
+              onBlur={handleBlur}/>
+              {errors.email && <p className="error">{errors.email}</p>}
+          </div>
+          <div className="form-group">
+              <label htmlFor="password">Password:</label>
+              <input type="password" id="password" name="password" required
+              onChange={handleChange}
+              onBlur={handleBlur}/>
+              {errors.password && <p className="error">{errors.password}</p>}
+          </div>
+          <div className="form-group">
+              <button type="submit">ENTRAR</button>
+          </div>
+          <Link href='/wellcome'>Wellcome</Link>
+        </form>
       </div>
-    </main>
+    </div>
+  </main>
+    }
+    {token && <WellcomePage />}
+    </>
   );
 }
