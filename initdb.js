@@ -1,5 +1,6 @@
 const sql = require('better-sqlite3')
 const db = sql('furnitureshop.db');
+const bcrypt = require('bcrypt');
 
 const dummyClients = [
    {
@@ -41,6 +42,15 @@ const dummyProducts = [
    },
 ]
 
+const dummyUsers = [
+   {
+      email: 'sjobs@mail.com',
+      name: 'Steve',
+      lastname: 'Jobs',
+      password: bcrypt.hashSync('password1', 10)
+   }
+]
+
 db.prepare(`
    CREATE TABLE IF NOT EXISTS client (
        id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -70,6 +80,7 @@ db.prepare(`
 db.prepare(`
    CREATE TABLE IF NOT EXISTS user (
        id INTEGER PRIMARY KEY AUTOINCREMENT,
+       email TEXT NOT NULL,
        name TEXT NOT NULL,
        lastName TEXT NOT NULL,
        password TEXT NOT NULL
@@ -118,31 +129,27 @@ async function initData() {
       )
    `);
 
-  for (const client of dummyClients) {
-    clientInsert.run(client);
-  }
+   const userInsert = db.prepare(`
+      INSERT INTO user 
+      ( email, name, lastname, password) VALUES (
+         @email,
+         @name,
+         @lastname,
+         @password
+      )
+   `);
 
-  for (const product of dummyProducts) {
-   productInsert.run(product);
- }
+   for (const client of dummyClients) {
+      clientInsert.run(client);
+   }
+
+   for (const product of dummyProducts) {
+      productInsert.run(product);
+   }
+
+   for (const user of dummyUsers) {
+      userInsert.run(user);
+   }
 }
 
 initData();
-
-// CLIENT
-// id, name, lastname, document, birthdate
-
-// PRODUCT
-// id, description, price
-
-// ESTIMATE
-// id, creationDate, updateDate
-
-// USER
-// id, name, lastName, password
-
-// PRODUCT_ESTIMATE
-// id_product, id_estimate, quantity
-
-// CLIENT_ESTIMATE
-// id_client, id_estimate
