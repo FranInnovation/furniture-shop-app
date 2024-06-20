@@ -4,10 +4,15 @@ import { ChangeEvent, FormEvent, useState, FocusEvent } from "react";
 import classes from "./page.module.css";
 import Link from "next/link";
 import WellcomePage from "./wellcome/page";
+import { UserContext, UserProvider } from "@/store/user-context";
+import { useContext } from "react";
+import { User } from "@/store/user-context";
 
 export default function Home() {
 
-  const [user, setUser] = useState(null)
+  // const [user, setUser] = useState(null)
+
+  const userCtx = useContext(UserContext);
 
   const [token, setToken] = useState(localStorage.getItem('token') || '')
 
@@ -56,6 +61,15 @@ export default function Home() {
     const data = await res.json();
 
     if(res.ok) {
+      const newUser: User = {
+        email: data.user.email,
+        name: data.user.name,
+        lastname: data.user.lastname
+      }
+      console.log('newUser: ', newUser.name)
+      userCtx.setUser(newUser)
+      console.log('userCTX: ', userCtx.user.name)
+
       setToken(data.token);
       localStorage.setItem('token', data.token)
       console.log('Localstorage: ', localStorage.getItem('token'))
@@ -66,6 +80,7 @@ export default function Home() {
 
   return (
     <>
+    <UserProvider>
     { !token &&
     <main className={classes.main}>
     <div className={classes.login_animation_container}>
@@ -102,6 +117,7 @@ export default function Home() {
   </main>
     }
     {token && <WellcomePage />}
+    </UserProvider>
     </>
   );
 }

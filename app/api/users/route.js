@@ -2,7 +2,7 @@
 import { NextResponse } from 'next/server';
 import { getUsers, getUserByEmail } from '../../../lib/users';
 import jwt from 'jsonwebtoken';
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcrypt';
 
 const ServerSecretKey = 'Server_Secret_Key'
 
@@ -14,10 +14,9 @@ export async function GET() {
 export async function POST(request) {
     const { email, password } = await request.json();
     const user = getUserByEmail(email);
-    console.log('USER: ', user)
     if (user && bcrypt.compareSync(password, user.password)) {
         const token = jwt.sign({ id: user.id, email: user.email }, ServerSecretKey, { expiresIn: '1h'})
-        return NextResponse.json({ token });
+        return NextResponse.json({ user, token });
     } else {
         return NextResponse.json({ message: 'Invalid email or password' }, { status: 401 });
     }
